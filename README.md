@@ -11,12 +11,6 @@ A single-file, offline calculator showing how a Trump Account grows — the $1,0
 - Breaks down your money vs. market growth
 - Canvas growth chart
 
-## Tech
-
-One `index.html` — vanilla HTML/CSS/JS, no dependencies, works offline.
-
-Based on the official [Trump Accounts](https://trumpaccounts.gov) program. Projections are estimates for illustration only.
-
 ---
 
 Built with [OpenCode](https://opencode.ai) — a project I wanted to try after sleeping on it since January.
