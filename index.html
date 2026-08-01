@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trump Accounts Calculator — The American Dream Starts Now</title>
+<style>
+  :root {
+    --navy: #0b1733;
+    --navy-2: #13234d;
+    --navy-3: #1b2f63;
+    --gold: #e7b94a;
+    --gold-bright: #f5d98a;
+    --gold-dark: #c99a2e;
+    --cream: #f3ecd8;
+    --muted: #9fb0d0;
+    --growth: #4ade80;
+    --line: rgba(231, 185, 74, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #1d3470 0%, var(--navy) 60%),
+      var(--navy);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* ---------- Header ---------- */
+  header { text-align: center; padding: 28px 0 20px; }
+  .coins { display: flex; justify-content: center; gap: 10px; margin-bottom: 14px; }
+  .coin {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--gold-bright), var(--gold) 55%, var(--gold-dark));
+    border: 2px solid var(--gold-dark);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.45), inset 0 -3px 5px rgba(0,0,0,0.25);
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(30px, 6vw, 52px);
+    letter-spacing: 2px;
+    color: var(--gold-bright);
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+  }
+  .tagline { margin-top: 6px; font-size: clamp(15px, 2.4vw, 19px); color: var(--muted); letter-spacing: 1px; }
+
+  /* ---------- Layout ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    margin-top: 26px;
+  }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: linear-gradient(180deg, var(--navy-2), var(--navy));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+
+  .card h2 {
+    font-family: Georgia, serif;
+    font-size: 17px;
+    color: var(--gold-bright);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  /* ---------- Sliders ---------- */
+  .control { margin-bottom: 22px; }
+  .control:last-child { margin-bottom: 4px; }
+  .control label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 14px; color: var(--muted); margin-bottom: 8px;
+  }
+  .control .value { font-size: 17px; font-weight: 700; color: var(--cream); font-variant-numeric: tabular-nums; }
+  .control .sub { display: block; font-size: 12px; color: #6f81a8; margin-top: 2px; }
+
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 8px; border-radius: 6px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold) var(--pct, 0%), #2a3d73 var(--pct, 0%));
+    outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--gold-bright), var(--gold) 60%, var(--gold-dark));
+    border: 2px solid var(--gold-dark);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--gold-bright), var(--gold) 60%, var(--gold-dark));
+    border: 2px solid var(--gold-dark);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  input[type=range]:focus-visible { box-shadow: 0 0 0 3px rgba(231,185,74,0.35); }
+
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+  .tab {
+    flex: 1; padding: 12px 8px; cursor: pointer;
+    background: var(--navy-3); color: var(--muted);
+    border: 1px solid var(--line); border-radius: 12px;
+    font-size: 15px; font-weight: 600; font-family: Georgia, serif;
+    transition: all 0.15s ease;
+  }
+  .tab small { display: block; font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 400; color: inherit; opacity: 0.75; margin-top: 3px; }
+  .tab:hover { border-color: var(--gold); }
+  .tab.active {
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    color: #3a2c06; border-color: var(--gold-dark);
+    box-shadow: 0 4px 14px rgba(231,185,74,0.3);
+  }
+
+  /* ---------- Results ---------- */
+  .headline-label { font-size: 14px; color: var(--muted); letter-spacing: 0.5px; }
+  .headline {
+    font-family: Georgia, serif;
+    font-size: clamp(40px, 7vw, 62px);
+    font-weight: 700;
+    color: var(--gold-bright);
+    margin: 6px 0 4px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 3px 12px rgba(231,185,74,0.25);
+  }
+  .headline-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .breakdown { margin-bottom: 22px; }
+  .breakdown .bar {
+    display: flex; height: 26px; border-radius: 8px; overflow: hidden;
+    background: #1c2c58; border: 1px solid var(--line);
+  }
+  .bar .yours { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
+  .bar .growth { background: linear-gradient(180deg, #6ef0a0, var(--growth)); }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .legend .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  .note {
+    margin-top: 16px; padding: 12px 14px;
+    background: rgba(231,185,74,0.08);
+    border: 1px dashed var(--gold-dark);
+    border-radius: 10px;
+    font-size: 13px; color: var(--gold-bright); line-height: 1.5;
+  }
+
+  canvas { width: 100%; height: 300px; display: block; border-radius: 10px; background: #0a1530; }
+
+  footer {
+    margin-top: 26px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 12px; color: #6f81a8; line-height: 1.7; text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="coins" aria-hidden="true"><span class="coin"></span><span class="coin"></span><span class="coin"></span><span class="coin"></span></div>
+    <h1>TRUMP ACCOUNTS</h1>
+    <p class="tagline">The American Dream starts now.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- Left: controls -->
+    <section class="card" aria-label="Account settings">
+      <h2>Your Trump Account</h2>
+
+      <div class="control">
+        <label>
+          <span>Government seed <span class="sub">Treasury deposit, kids born 2025–2028</span></span>
+          <span class="value" id="seedVal">$1,000</span>
+        </label>
+        <input type="range" id="seed" min="0" max="1000" step="25" value="1000">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Your contribution <span class="sub">Per year, up to $5,000</span></span>
+          <span class="value" id="contribVal">$250/yr</span>
+        </label>
+        <input type="range" id="contrib" min="0" max="5000" step="25" value="250">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Expected return <span class="sub">Historical S&amp;P 500 average ≈ 10%</span></span>
+          <span class="value" id="rateVal">10%</span>
+        </label>
+        <input type="range" id="rate" min="0" max="15" step="0.5" value="10">
+      </div>
+
+      <div class="note" id="taxNote">&#9889; Grows tax-advantaged, traditional IRA–style. Contributions stop at 18 — at 18 the Trump Account is all theirs.</div>
+    </section>
+
+    <!-- Right: results -->
+    <section class="card" aria-label="Projections">
+      <div class="tabs" role="tablist" aria-label="Age">
+        <button class="tab active" data-age="18" role="tab" aria-selected="true">Age 18<small>It's all yours</small></button>
+        <button class="tab" data-age="27" role="tab" aria-selected="false">Age 27<small>Keep growing</small></button>
+        <button class="tab" data-age="55" role="tab" aria-selected="false">Age 55<small>Let it ride</small></button>
+      </div>
+
+      <div class="headline-label">Projected balance at age <span id="ageLabel">18</span></div>
+      <div class="headline" id="headline">$0</div>
+      <div class="headline-sub" id="headlineSub">—</div>
+
+      <div class="breakdown">
+        <div class="bar" role="img" aria-label="Your money vs growth">
+          <div class="yours" id="barYours" style="width:0%"></div>
+          <div class="growth" id="barGrowth" style="width:0%"></div>
+        </div>
+        <div class="legend">
+          <span><span class="sw" style="background:#e7b94a"></span><b style="color:var(--gold-bright)" id="yoursVal">$0</b> your money</span>
+          <span><span class="sw" style="background:#4ade80"></span><b style="color:var(--growth)" id="growthVal">$0</b> growth (free money)</span>
+        </div>
+      </div>
+
+      <canvas id="chart" width="600" height="300" aria-label="Growth chart"></canvas>
+    </section>
+
+  </div>
+
+  <footer>
+    Based on the official <b>Trump Accounts</b> program (trumpaccounts.gov): every U.S. citizen child born 2025–2028 receives
+    a $1,000 seed from the U.S. Treasury, parents may add up to $5,000/year, and funds are invested in American companies.
+    Projections use historical S&amp;P 500 averages and are estimates for illustration only — actual results are not guaranteed.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Core math (pure, tested) ---------- */
+
+  // Future value with monthly compounding. `annual` is contributed monthly (annual/12).
+  function futureValue(start, annual, ratePct, months) {
+    var r = ratePct / 100 / 12;
+    var n = months;
+    var principal = start * Math.pow(1 + r, n);
+    var contrib = r !== 0
+      ? (annual / 12) * ((Math.pow(1 + r, n) - 1) / r)
+      : (annual / 12) * n;
+    return principal + contrib;
+  }
+
+  function selfTest() {
+    var tol = 0.5;
+    function approx(a, b) { return Math.abs(a - b) <= tol; }
+    var cases = [
+      ["fv(0,0,0,120)=0",         approx(futureValue(0, 0, 0, 120), 0)],
+      ["fv(1000,0,0,120)=1000",   approx(futureValue(1000, 0, 0, 120), 1000)],
+      ["fv(1000,0,10,120)~2707",  approx(futureValue(1000, 0, 10, 120), 2707.04)],
+      ["fv(0,1200,0,120)=12000",  approx(futureValue(0, 1200, 0, 120), 12000)],
+      ["fv(100,600,5,12)~719",    approx(futureValue(100, 600, 5, 12), 719.06)]
+    ];
+    var failed = cases.filter(function (c) { return !c[1]; });
+    if (failed.length === 0) { console.log("SELF-TEST PASS — all " + cases.length + " math assertions"); }
+    else { console.error("SELF-TEST FAIL:", failed); }
+  }
+
+  /* ---------- Model ---------- */
+
+  var AGE_MAX = 55;
+
+  function balanceAt(seed, annual, ratePct, age) {
+    var at18 = futureValue(seed, annual, ratePct, 18 * 12);
+    if (age <= 18) return futureValue(seed, annual, ratePct, age * 12);
+    var r = ratePct / 100 / 12;
+    return at18 * Math.pow(1 + r, (age - 18) * 12);
+  }
+
+  function putInAt(seed, annual, age) {
+    var years = Math.min(age, 18);
+    return seed + annual * years;
+  }
+
+  /* ---------- Formatting ---------- */
+
+  function fmt(n) {
+    return "$" + n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  }
+
+  function fmtCompact(n) {
+    if (n >= 1e9) return "$" + (n / 1e9).toFixed(1) + "B";
+    if (n >= 1e6) return "$" + (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return "$" + (n / 1e3).toFixed(0) + "k";
+    return "$" + Math.round(n);
+  }
+
+  /* ---------- State + DOM ---------- */
+
+  var seedEl = document.getElementById("seed");
+  var contribEl = document.getElementById("contrib");
+  var rateEl = document.getElementById("rate");
+  var ageEl = null;
+  var activeAge = 18;
+  var canvas = document.getElementById("chart");
+  var ctx = canvas.getContext("2d");
+
+  function state() {
+    return {
+      seed: +seedEl.value,
+      annual: +contribEl.value,
+      rate: +rateEl.value,
+      age: activeAge
+    };
+  }
+
+  function setSliderFill(el) {
+    var pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+    el.style.setProperty("--pct", pct + "%");
+  }
+
+  document.querySelectorAll(".tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      activeAge = +tab.dataset.age;
+      document.querySelectorAll(".tab").forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      update();
+    });
+  });
+
+  /* ---------- Render ---------- */
+
+  function update() {
+    var s = state();
+
+    document.getElementById("seedVal").textContent = fmt(s.seed);
+    document.getElementById("contribVal").textContent = fmt(s.annual) + "/yr";
+    document.getElementById("rateVal").textContent = s.rate + "%";
+    setSliderFill(seedEl); setSliderFill(contribEl); setSliderFill(rateEl);
+
+    var balance = balanceAt(s.seed, s.annual, s.rate, s.age);
+    var putIn = putInAt(s.seed, s.annual, s.age);
+    var growth = balance - putIn;
+
+    document.getElementById("ageLabel").textContent = s.age;
+    document.getElementById("headline").textContent = fmt(balance);
+    document.getElementById("headlineSub").textContent =
+      "You and the government put in " + fmt(putIn) + " — growth made " + fmt(growth) + " for free.";
+
+    var total = Math.max(balance, 1);
+    document.getElementById("barYours").style.width = ((putIn / total) * 100) + "%";
+    document.getElementById("barGrowth").style.width = ((growth / total) * 100) + "%";
+    document.getElementById("yoursVal").textContent = fmt(putIn);
+    document.getElementById("growthVal").textContent = fmt(growth);
+
+    drawChart(s);
+  }
+
+  function niceTop(max) {
+    if (max <= 0) return 1000;
+    var mag = Math.pow(10, Math.floor(Math.log10(max)));
+    return Math.ceil((max * 1.1) / mag) * mag;
+  }
+
+  function drawChart(s) {
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = canvas.clientWidth || 600;
+    var cssH = canvas.clientHeight || 300;
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    var padL = 52, padR = 14, padT = 14, padB = 30;
+    var plotW = cssW - padL - padR;
+    var plotH = cssH - padT - padB;
+
+    var maxVal = 0;
+    for (var y = 0; y <= AGE_MAX; y++) {
+      maxVal = Math.max(maxVal, balanceAt(s.seed, s.annual, s.rate, y), putInAt(s.seed, s.annual, y));
+    }
+    var top = niceTop(maxVal);
+
+    var x = function (age) { return padL + (age / AGE_MAX) * plotW; };
+    var yPix = function (v) { return padT + plotH - (v / top) * plotH; };
+
+    ctx.strokeStyle = "rgba(159,176,208,0.25)";
+    ctx.fillStyle = "#7e90b8";
+    ctx.font = "11px -apple-system, sans-serif";
+    ctx.textAlign = "right";
+    ctx.lineWidth = 1;
+
+    var gridN = 5;
+    for (var g = 0; g <= gridN; g++) {
+      var val = top * g / gridN;
+      var gy = yPix(val);
+      ctx.beginPath();
+      ctx.moveTo(padL, gy);
+      ctx.lineTo(cssW - padR, gy);
+      ctx.stroke();
+      ctx.fillText(fmtCompact(val), padL - 8, gy + 4);
+    }
+
+    ctx.textAlign = "center";
+    for (var yl = 0; yl <= AGE_MAX; yl += 5) {
+      ctx.fillText(yl, x(yl), cssH - 10);
+    }
+
+    // Contributions line (gray, dashed)
+    ctx.beginPath();
+    for (var cy = 0; cy <= AGE_MAX; cy++) {
+      var cx = x(cy), cpy = yPix(putInAt(s.seed, s.annual, cy));
+      if (cy === 0) ctx.moveTo(cx, cpy); else ctx.lineTo(cx, cpy);
+    }
+    ctx.strokeStyle = "#8a9cc2";
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Balance line (gold)
+    ctx.beginPath();
+    for (var by = 0; by <= AGE_MAX; by++) {
+      var bx = x(by), bpy = yPix(balanceAt(s.seed, s.annual, s.rate, by));
+      if (by === 0) ctx.moveTo(bx, bpy); else ctx.lineTo(bx, bpy);
+    }
+    ctx.strokeStyle = "#e7b94a";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Active-age marker
+    var mx = x(s.age), mpy = yPix(balanceAt(s.seed, s.annual, s.rate, s.age));
+    ctx.strokeStyle = "rgba(231,185,74,0.4)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(mx, padT); ctx.lineTo(mx, cssH - padB); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(mx, mpy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = "#f5d98a";
+    ctx.fill();
+    ctx.strokeStyle = "#c99a2e";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = "#7e90b8";
+    ctx.textAlign = "center";
+    ctx.font = "11px -apple-system, sans-serif";
+    ctx.fillText("age (years)", cssW - padR, cssH - 8);
+  }
+
+  /* ---------- Wire up ---------- */
+
+  [seedEl, contribEl, rateEl].forEach(function (el) {
+    el.addEventListener("input", update);
+  });
+
+  window.addEventListener("resize", function () { if (activeAge >= 0) drawChart(state()); });
+
+  selfTest();
+  update();
+})();
+</script>
+</body>
+</html>
