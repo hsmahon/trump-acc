@@ -195,10 +195,9 @@
 
       <div class="control">
         <label>
-          <span>Government seed <span class="sub">Treasury deposit, kids born 2025–2028</span></span>
+          <span>Government seed <span class="sub">Auto-applied Treasury deposit</span></span>
           <span class="value" id="seedVal">$1,000</span>
         </label>
-        <input type="range" id="seed" min="0" max="1000" step="25" value="1000">
       </div>
 
       <div class="control">
@@ -320,7 +319,7 @@
 
   /* ---------- State + DOM ---------- */
 
-  var seedEl = document.getElementById("seed");
+  var SEED = 1000;
   var contribEl = document.getElementById("contrib");
   var rateEl = document.getElementById("rate");
   var activeAge = 18;
@@ -330,7 +329,7 @@
 
   function state() {
     return {
-      seed: +seedEl.value,
+      seed: SEED,
       annual: +contribEl.value,
       rate: +rateEl.value,
       age: activeAge
@@ -359,10 +358,10 @@
   function update() {
     var s = state();
 
-    document.getElementById("seedVal").textContent = fmt(s.seed);
+    document.getElementById("seedVal").textContent = fmt(SEED);
     document.getElementById("contribVal").textContent = fmt(s.annual) + "/yr";
     document.getElementById("rateVal").textContent = s.rate + "%";
-    setSliderFill(seedEl); setSliderFill(contribEl); setSliderFill(rateEl);
+    setSliderFill(contribEl); setSliderFill(rateEl);
 
     var balance = balanceAt(s.seed, s.annual, s.rate, s.age);
     var putIn = putInAt(s.seed, s.annual, s.age);
@@ -524,7 +523,7 @@
 
   /* ---------- Wire up ---------- */
 
-  [seedEl, contribEl, rateEl].forEach(function (el) {
+  [contribEl, rateEl].forEach(function (el) {
     el.addEventListener("input", update);
   });
 
