@@ -19,6 +19,8 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background:
@@ -29,25 +31,37 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 60px; }
+  .wrap {
+    max-width: 1080px;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0 auto;
+    padding: 14px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
   /* ---------- Header ---------- */
-  header { text-align: center; padding: 30px 0 20px; }
-  .flags { font-size: 26px; letter-spacing: 6px; margin-bottom: 12px; }
+  header { flex: 0 0 auto; text-align: center; padding: 10px 0 8px; }
+  .flags { font-size: 24px; letter-spacing: 6px; margin-bottom: 8px; }
   h1 {
     font-weight: 800;
     font-size: clamp(30px, 6vw, 48px);
     letter-spacing: 5px;
     color: var(--white);
   }
-  .tagline { margin-top: 8px; font-size: clamp(15px, 2.4vw, 18px); color: var(--muted); letter-spacing: 0.5px; }
+  .tagline { margin-top: 6px; font-size: clamp(15px, 2.4vw, 18px); color: var(--muted); letter-spacing: 0.5px; }
 
   /* ---------- Layout ---------- */
   .grid {
     display: grid;
     grid-template-columns: 340px 1fr;
-    gap: 22px;
-    margin-top: 26px;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 18px;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 14px;
   }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
 
@@ -55,8 +69,12 @@
     background: linear-gradient(180deg, var(--black-2), var(--black));
     border: 1px solid var(--line);
     border-radius: 18px;
-    padding: 24px;
+    padding: 20px;
     box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .card h2 {
@@ -65,15 +83,16 @@
     color: var(--muted);
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
   }
 
   /* ---------- Sliders ---------- */
-  .control { margin-bottom: 22px; }
+  .control { margin-bottom: 18px; flex-shrink: 0; }
   .control:last-child { margin-bottom: 4px; }
   .control label {
     display: flex; justify-content: space-between; align-items: baseline;
-    font-size: 14px; color: var(--muted); margin-bottom: 12px;
+    font-size: 14px; color: var(--muted); margin-bottom: 10px;
   }
   .control .value {
     font-size: 17px; font-weight: 700; color: var(--white);
@@ -109,7 +128,8 @@
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--line);
     border-radius: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
   }
   .tab {
     flex: 1; padding: 11px 8px; cursor: pointer;
@@ -127,20 +147,22 @@
   }
 
   /* ---------- Results ---------- */
-  .headline-label { font-size: 13px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .headline-label { font-size: 13px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
   .headline {
-    font-size: clamp(42px, 7vw, 64px);
+    font-size: clamp(40px, 7vw, 62px);
     font-weight: 800;
     color: var(--white);
-    margin: 8px 0 6px;
+    margin: 6px 0 4px;
     font-variant-numeric: tabular-nums;
     letter-spacing: -1px;
+    line-height: 1.1;
+    flex-shrink: 0;
   }
-  .headline-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .headline-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; flex-shrink: 0; }
   .headline-sub b { color: var(--white); font-weight: 600; }
   .headline-sub b.gold { color: var(--gold); }
 
-  .breakdown { margin-bottom: 24px; }
+  .breakdown { margin-bottom: 16px; flex-shrink: 0; }
   .breakdown .bar {
     display: flex; height: 30px; border-radius: 9px; overflow: hidden;
     background: rgba(255,255,255,0.06); border: 1px solid var(--line);
@@ -158,23 +180,55 @@
   .legend b { color: var(--white); font-weight: 600; }
 
   .note {
-    margin-top: 18px; padding: 12px 14px;
+    margin-top: 14px; padding: 10px 14px;
     background: rgba(231,185,74,0.07);
     border: 1px dashed rgba(231,185,74,0.4);
     border-radius: 10px;
     font-size: 13px; color: var(--gold-bright); line-height: 1.5;
+    flex-shrink: 0;
   }
 
   canvas {
-    width: 100%; height: 300px; display: block;
+    width: 100%; flex: 1 1 auto; min-height: 80px; display: block;
     border-radius: 12px; background: var(--black);
     border: 1px solid var(--line);
   }
 
   footer {
-    margin-top: 28px; padding-top: 18px;
+    flex: 0 0 auto;
+    margin-top: 12px; padding-top: 12px;
     border-top: 1px solid var(--line);
-    font-size: 12px; color: #6f6f76; line-height: 1.7; text-align: center;
+    font-size: 12px; color: #6f6f76; line-height: 1.5; text-align: center;
+  }
+
+  /* ---------- Compact: tablet / mobile ---------- */
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+    }
+    .wrap { padding: 8px 12px 10px; }
+    header { padding: 4px 0 2px; }
+    .flags { font-size: 18px; letter-spacing: 4px; margin-bottom: 2px; }
+    h1 { font-size: clamp(22px, 7vw, 40px); letter-spacing: 3px; line-height: 1.05; }
+    .tagline { font-size: 13px; margin-top: 2px; }
+    .grid { gap: 10px; margin-top: 8px; }
+    .card { padding: 12px; border-radius: 14px; }
+    .card h2 { margin-bottom: 10px; }
+    .control { margin-bottom: 10px; }
+    .control label { font-size: 13px; margin-bottom: 6px; }
+    .control .value { font-size: 15px; }
+    .control .sub { font-size: 11px; }
+    .tabs { margin-bottom: 10px; }
+    .tab { padding: 8px 6px; font-size: 13px; }
+    .headline { font-size: clamp(32px, 10vw, 50px); margin: 3px 0 2px; }
+    .headline-sub { font-size: 12px; margin-bottom: 10px; }
+    .breakdown { margin-bottom: 10px; }
+    .breakdown .bar { height: 24px; }
+    .legend { font-size: 12px; gap: 12px; margin-top: 6px; }
+    .note { margin-top: 10px; font-size: 12px; padding: 8px 12px; }
+    footer { font-size: 10px; margin-top: 6px; padding-top: 6px; }
+    canvas { min-height: 60px; }
   }
 </style>
 </head>
