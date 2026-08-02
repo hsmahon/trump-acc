@@ -43,16 +43,16 @@
   }
 
   /* ---------- Header ---------- */
-  header { flex: 0 0 auto; text-align: center; padding: 10px 0 8px; }
-  .flags { font-size: 24px; letter-spacing: 6px; margin-bottom: 8px; }
+  header { flex: 0 0 auto; text-align: center; padding: 8px 0 4px; }
+  .flags { font-size: 20px; letter-spacing: 6px; margin-bottom: 4px; }
   h1 {
     font-weight: 800;
-    font-size: clamp(30px, 6vw, 46px);
-    letter-spacing: 5px;
+    font-size: clamp(26px, 4.5vw, 38px);
+    letter-spacing: 4px;
     color: var(--white);
     line-height: 1.1;
   }
-  .tagline { margin-top: 6px; font-size: clamp(15px, 2.4vw, 18px); color: var(--muted); letter-spacing: 0.5px; }
+  .tagline { margin-top: 3px; font-size: 15px; color: var(--muted); letter-spacing: 0.5px; }
 
   /* ---------- Layout ---------- */
   .grid {
@@ -70,7 +70,7 @@
     background: linear-gradient(180deg, var(--black-2), var(--black));
     border: 1px solid var(--line);
     border-radius: 18px;
-    padding: 20px;
+    padding: 14px;
     box-shadow: 0 12px 36px rgba(0,0,0,0.5);
     min-height: 0;
     overflow: hidden;
@@ -182,12 +182,12 @@
   .bar .growth { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); flex: 1 1 auto; }
 
   .money-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-  .money-tile { border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+  .money-tile { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; }
   .money-tile .tile-label {
-    display: block; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+    display: block; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 1px;
   }
   .money-tile .tile-value {
-    display: block; font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.5px;
+    display: block; font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.5px;
   }
   .money-tile.yours { background: rgba(255,255,255,0.05); }
   .money-tile.yours .tile-value { color: var(--white); }
@@ -196,20 +196,21 @@
   .money-tile.growth .tile-value { color: var(--gold-bright); }
 
   /* ---------- What you could buy ---------- */
-  .buy { margin-bottom: 12px; flex-shrink: 0; }
+  .buy { margin-bottom: 10px; flex-shrink: 0; }
   .buy-label {
-    font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
   }
   .buy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .buy-item {
-    border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px;
+    border: 1px solid var(--line); border-radius: 9px; padding: 5px 8px;
     background: rgba(255,255,255,0.03);
   }
+  .buy-item .bi-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
   .buy-item .bi-name { font-size: 12px; font-weight: 600; color: var(--white); }
-  .buy-item .bi-avg { font-size: 10px; color: var(--muted); }
-  .buy-item .bi-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); margin: 5px 0 4px; overflow: hidden; }
+  .buy-item .bi-val { font-size: 12px; font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .buy-item .bi-avg { display: block; font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .buy-item .bi-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); margin: 4px 0 0; overflow: hidden; }
   .buy-item .bi-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
-  .buy-item .bi-val { font-size: 12px; font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
 
   .note {
     margin-top: 14px; padding: 10px 14px;
@@ -221,7 +222,7 @@
   }
 
   canvas {
-    width: 100%; flex: 1 1 auto; min-height: 90px; display: block;
+    width: 100%; flex: 1 1 auto; min-height: 60px; display: block;
     border-radius: 12px; background: var(--black);
     border: 1px solid var(--line);
   }
@@ -274,6 +275,53 @@
     .note { margin-top: 5px; padding: 5px 8px; font-size: 9px; }
     footer { font-size: 8px; margin-top: 3px; padding-top: 3px; }
     canvas { min-height: 30px; }
+  }
+
+  /* ---------- Short screens: compress harder ---------- */
+  @media (max-height: 660px) {
+    .wrap { padding-top: 2px; padding-bottom: 4px; }
+    header { padding: 2px 0 0; }
+    .flags { font-size: 14px; margin-bottom: 0; }
+    h1 { font-size: 22px; }
+    .tagline { display: none; }
+    .grid { margin-top: 4px; gap: 8px; }
+    .card { padding: 10px; }
+    .card h2 { margin-bottom: 8px; }
+    .control { margin-bottom: 8px; }
+    .tabs { margin-bottom: 8px; }
+    .headline { font-size: clamp(24px, 4vw, 34px); margin: 2px 0; }
+    .headline-sub { margin-bottom: 8px; }
+    .breakdown { margin-bottom: 8px; }
+    .breakdown .bar { height: 20px; }
+    .money-tiles { gap: 6px; margin-top: 6px; }
+    .money-tile { padding: 5px 8px; }
+    .money-tile .tile-value { font-size: 15px; }
+    .buy { margin-bottom: 6px; }
+    .buy-item { padding: 3px 6px; }
+    .buy-item .bi-name { font-size: 11px; }
+    footer { margin-top: 4px; padding-top: 4px; }
+    canvas { min-height: 40px; }
+  }
+
+  /* ---------- Tiny phones (narrow AND short): squeeze further ---------- */
+  @media (max-height: 640px) and (max-width: 480px) {
+    .tagline { display: none; }
+    .headline-sub { display: none; }
+    .flags { font-size: 12px; }
+    .note { display: none; }
+    .control label { font-size: 10px; margin-bottom: 1px; }
+    .control { margin-bottom: 6px; }
+    .control input { margin-top: 0; }
+    .money-tile { padding: 4px 6px; }
+    .money-tile .tile-label { font-size: 7px; }
+    .money-tile .tile-value { font-size: 12px; }
+    .buy-item { padding: 2px 3px; }
+    .buy-item .bi-name { font-size: 8px; }
+    .buy-item .bi-avg { font-size: 7px; }
+    .buy-item .bi-val { font-size: 8px; }
+    .buy-item .bi-bar { margin: 1px 0; }
+    .buy { margin-bottom: 3px; }
+    canvas { min-height: 28px; }
   }
 </style>
 </head>
@@ -353,28 +401,24 @@
         <div class="buy-label">What your balance could buy</div>
         <div class="buy-grid">
           <div class="buy-item">
-            <div class="bi-name">🚗 Car</div>
+            <div class="bi-head"><div class="bi-name">🚗 Car</div><div class="bi-val" id="buyCarVal">—</div></div>
             <div class="bi-avg">avg $48k</div>
             <div class="bi-bar"><div class="bi-fill" id="buyCar" style="width:0%"></div></div>
-            <div class="bi-val" id="buyCarVal">—</div>
           </div>
           <div class="buy-item">
-            <div class="bi-name">🎓 Undergrad</div>
+            <div class="bi-head"><div class="bi-name">🎓 Undergrad</div><div class="bi-val" id="buySchoolVal">—</div></div>
             <div class="bi-avg">avg $160k</div>
             <div class="bi-bar"><div class="bi-fill" id="buySchool" style="width:0%"></div></div>
-            <div class="bi-val" id="buySchoolVal">—</div>
           </div>
           <div class="buy-item">
-            <div class="bi-name">⚖️ Law school</div>
+            <div class="bi-head"><div class="bi-name">⚖️ Law school</div><div class="bi-val" id="buyLawVal">—</div></div>
             <div class="bi-avg">avg $240k</div>
             <div class="bi-bar"><div class="bi-fill" id="buyLaw" style="width:0%"></div></div>
-            <div class="bi-val" id="buyLawVal">—</div>
           </div>
           <div class="buy-item">
-            <div class="bi-name">🏠 House</div>
+            <div class="bi-head"><div class="bi-name">🏠 House</div><div class="bi-val" id="buyHouseVal">—</div></div>
             <div class="bi-avg">avg $450k</div>
             <div class="bi-bar"><div class="bi-fill" id="buyHouse" style="width:0%"></div></div>
-            <div class="bi-val" id="buyHouseVal">—</div>
           </div>
         </div>
       </div>
