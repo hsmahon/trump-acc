@@ -239,32 +239,41 @@
       grid-template-columns: 1fr;
       grid-template-rows: minmax(0, auto) minmax(0, 1fr);
     }
-    .wrap { padding: 8px 12px 10px; }
-    header { padding: 4px 0 2px; }
-    .flags { font-size: 18px; letter-spacing: 4px; margin-bottom: 2px; }
-    h1 { font-size: clamp(22px, 7vw, 40px); letter-spacing: 3px; line-height: 1.05; }
-    .tagline { font-size: 13px; margin-top: 2px; }
-    .grid { gap: 10px; margin-top: 8px; }
-    .card { padding: 12px; border-radius: 14px; }
-    .card h2 { margin-bottom: 10px; }
-    .control { margin-bottom: 10px; }
-    .control label { font-size: 13px; margin-bottom: 6px; }
-    .control .value { font-size: 15px; }
-    .control .sub { font-size: 11px; }
-    .tabs { margin-bottom: 10px; }
-    .tab { padding: 8px 6px; font-size: 13px; }
-    .headline { font-size: clamp(32px, 10vw, 50px); margin: 3px 0 2px; }
-    .headline-sub { font-size: 12px; margin-bottom: 10px; }
-    .breakdown { margin-bottom: 10px; }
-    .breakdown .bar { height: 24px; }
-    .money-tiles { gap: 8px; margin-top: 8px; }
-    .money-tile { padding: 10px 12px; }
-    .money-tile .tile-value { font-size: 18px; }
-    .buy { margin-bottom: 10px; }
-    .buy-grid { grid-template-columns: repeat(2, 1fr); }
-    .note { margin-top: 10px; font-size: 12px; padding: 8px 12px; }
-    footer { font-size: 10px; margin-top: 6px; padding-top: 6px; }
-    canvas { min-height: 60px; }
+    .wrap { padding: 2px 10px 4px; }
+    header { padding: 0; }
+    .flags { font-size: 12px; letter-spacing: 2px; margin-bottom: 0; }
+    h1 { font-size: 16px; letter-spacing: 2px; line-height: 1.05; }
+    .tagline { font-size: 9px; margin-top: 0; }
+    .grid { gap: 5px; margin-top: 3px; }
+    .card { padding: 8px; border-radius: 10px; }
+    .card h2 { margin-bottom: 5px; font-size: 10px; }
+    .control { margin-bottom: 5px; }
+    .control label { font-size: 11px; margin-bottom: 3px; }
+    .control .value { font-size: 12px; }
+    .control .sub { font-size: 9px; }
+    .tabs { margin-bottom: 5px; padding: 2px; }
+    .tab { padding: 4px 3px; font-size: 11px; }
+    .tab small { font-size: 8px; }
+    .headline-label { font-size: 9px; }
+    .headline { font-size: clamp(22px, 8vw, 32px); margin: 1px 0; }
+    .headline-sub { font-size: 10px; margin-bottom: 5px; }
+    .breakdown { margin-bottom: 5px; }
+    .breakdown .bar { height: 16px; }
+    .money-tiles { gap: 5px; margin-top: 5px; }
+    .money-tile { padding: 5px 8px; }
+    .money-tile .tile-label { font-size: 8px; }
+    .money-tile .tile-value { font-size: 13px; }
+    .buy { margin-bottom: 5px; }
+    .buy-label { font-size: 9px; margin-bottom: 3px; }
+    .buy-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+    .buy-item { padding: 3px 4px; }
+    .buy-item .bi-name { font-size: 9px; }
+    .buy-item .bi-avg { font-size: 8px; }
+    .buy-item .bi-bar { margin: 2px 0; }
+    .buy-item .bi-val { font-size: 9px; }
+    .note { margin-top: 5px; padding: 5px 8px; font-size: 9px; }
+    footer { font-size: 8px; margin-top: 3px; padding-top: 3px; }
+    canvas { min-height: 30px; }
   }
 </style>
 </head>
@@ -306,7 +315,7 @@
         <input type="range" id="rate" min="5" max="15" step="0.5" value="10">
       </div>
 
-      <div class="note" id="taxNote">🏛️ Grows tax-advantaged, traditional IRA–style. Contributions stop at 18 — at 18 the Trump Account is all theirs.</div>
+      <div class="note" id="taxNote">🏛️ Tax-advantaged, traditional IRA-style. Contributions stop at 18.</div>
     </section>
 
     <!-- Right: results -->
@@ -374,10 +383,7 @@
   </div>
 
   <footer>
-    Based on the official <b>Trump Accounts</b> program (trumpaccounts.gov): every U.S. citizen child born 2025–2028 receives
-    a $1,000 seed from the U.S. Treasury, parents may add up to $5,000/year, and funds are invested in American companies.
-    Projections use historical S&amp;P 500 averages and are estimates for illustration only — actual results are not guaranteed.
-    🇺🇸 🦅
+    Based on the official Trump Accounts program (trumpaccounts.gov). Projections are estimates for illustration only. 🇺🇸 🦅
   </footer>
 
 </div>
