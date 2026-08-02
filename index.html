@@ -472,8 +472,6 @@
 
   /* ---------- Model ---------- */
 
-  var AGE_MAX = 55;
-
   function balanceAt(seed, annual, ratePct, age) {
     var at18 = futureValue(seed, annual, ratePct, 18 * 12);
     if (age <= 18) return futureValue(seed, annual, ratePct, age * 12);
@@ -631,13 +629,14 @@
     var plotW = cssW - padL - padR;
     var plotH = cssH - padT - padB;
 
+    var xMax = s.age;
     var maxVal = 0;
-    for (var a = 0; a <= AGE_MAX; a += 0.5) {
+    for (var a = 0; a <= xMax; a += 0.5) {
       maxVal = Math.max(maxVal, balanceAt(s.seed, s.annual, s.rate, a), putInAt(s.seed, s.annual, a));
     }
     var top = niceTop(maxVal);
 
-    var x = function (age) { return padL + (age / AGE_MAX) * plotW; };
+    var x = function (age) { return padL + (age / xMax) * plotW; };
     var yPix = function (v) { return padT + plotH - (v / top) * plotH; };
 
     // Grid
@@ -659,17 +658,18 @@
     }
 
     ctx.textAlign = "center";
-    for (var yl = 0; yl <= AGE_MAX; yl += 5) {
+    for (var yl = 0; yl <= xMax; yl += 5) {
       ctx.fillText(yl, x(yl), cssH - 16);
     }
+    if (xMax % 5 !== 0) ctx.fillText(xMax, x(xMax), cssH - 16);
 
     // Balance area (gold gradient fill)
     var balPts = [];
-    for (var ba = 0; ba <= AGE_MAX; ba += 0.5) {
+    for (var ba = 0; ba <= xMax; ba += 0.5) {
       balPts.push({ x: x(ba), y: yPix(balanceAt(s.seed, s.annual, s.rate, ba)) });
     }
     smoothPath(balPts);
-    ctx.lineTo(x(AGE_MAX), cssH - padB);
+    ctx.lineTo(x(xMax), cssH - padB);
     ctx.lineTo(padL, cssH - padB);
     ctx.closePath();
     var grad = ctx.createLinearGradient(0, padT, 0, cssH - padB);
@@ -680,7 +680,7 @@
 
     // Contributions line (white, dashed)
     ctx.beginPath();
-    for (var cy = 0; cy <= AGE_MAX; cy++) {
+    for (var cy = 0; cy <= xMax; cy++) {
       var cx = x(cy), cpy = yPix(putInAt(s.seed, s.annual, cy));
       if (cy === 0) ctx.moveTo(cx, cpy); else ctx.lineTo(cx, cpy);
     }
