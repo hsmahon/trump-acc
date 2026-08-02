@@ -196,18 +196,19 @@
   .money-tile.growth .tile-value { color: var(--gold-bright); }
 
   /* ---------- What you could buy ---------- */
-  .buy { margin-bottom: 10px; flex-shrink: 0; }
+  .buy { margin-top: 10px; margin-bottom: 10px; flex-shrink: 0; }
   .buy-label {
     font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
   }
-  .buy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .buy-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   .buy-item {
+    min-width: 0; overflow: hidden;
     border: 1px solid var(--line); border-radius: 9px; padding: 5px 8px;
     background: rgba(255,255,255,0.03);
   }
-  .buy-item .bi-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
-  .buy-item .bi-name { font-size: 12px; font-weight: 600; color: var(--white); }
-  .buy-item .bi-val { font-size: 12px; font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .buy-item .bi-head { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .buy-item .bi-name { font-size: 12px; font-weight: 600; color: var(--white); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .buy-item .bi-val { font-size: 12px; font-weight: 700; color: var(--gold-bright); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .buy-item .bi-avg { display: block; font-size: 10px; color: var(--muted); margin-top: 1px; }
   .buy-item .bi-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); margin: 4px 0 0; overflow: hidden; }
   .buy-item .bi-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
@@ -266,12 +267,13 @@
     .money-tile .tile-value { font-size: 13px; }
     .buy { margin-bottom: 5px; }
     .buy-label { font-size: 9px; margin-bottom: 3px; }
-    .buy-grid { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+    .buy-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
     .buy-item { padding: 3px 4px; }
-    .buy-item .bi-name { font-size: 9px; }
+    .buy-item .bi-head { flex-direction: column; align-items: stretch; gap: 0; }
+    .buy-item .bi-name { font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .buy-item .bi-val { font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .buy-item .bi-avg { font-size: 8px; }
     .buy-item .bi-bar { margin: 2px 0; }
-    .buy-item .bi-val { font-size: 9px; }
     .note { margin-top: 5px; padding: 5px 8px; font-size: 9px; }
     footer { font-size: 8px; margin-top: 3px; padding-top: 3px; }
     canvas { min-height: 30px; }
