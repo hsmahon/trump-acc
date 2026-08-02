@@ -627,7 +627,7 @@
 
     ctx.clearRect(0, 0, cssW, cssH);
 
-    var padL = 52, padR = 14, padT = 14, padB = 30;
+    var padL = 52, padR = 14, padT = 14, padB = 40;
     var plotW = cssW - padL - padR;
     var plotH = cssH - padT - padB;
 
@@ -660,7 +660,7 @@
 
     ctx.textAlign = "center";
     for (var yl = 0; yl <= AGE_MAX; yl += 5) {
-      ctx.fillText(yl, x(yl), cssH - 10);
+      ctx.fillText(yl, x(yl), cssH - 16);
     }
 
     // Balance area (gold gradient fill)
@@ -721,9 +721,9 @@
 
     // Axis labels
     ctx.fillStyle = "#8a8a92";
-    ctx.textAlign = "center";
-    ctx.font = "11px -apple-system, sans-serif";
-    ctx.fillText("age (years)", cssW - padR, cssH - 8);
+    ctx.textAlign = "right";
+    ctx.font = "10px -apple-system, sans-serif";
+    ctx.fillText("age (years)", cssW - padR, cssH - 4);
   }
 
   /* ---------- Wire up ---------- */
