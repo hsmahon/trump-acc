@@ -598,10 +598,11 @@
     });
   }
 
-  function niceTop(max) {
+  function niceTop(max, headroom) {
     if (max <= 0) return 1000;
+    headroom = headroom || 1.1;
     var mag = Math.pow(10, Math.floor(Math.log10(max)));
-    return Math.ceil((max * 1.1) / mag) * mag;
+    return Math.ceil((max * headroom) / mag) * mag;
   }
 
   function smoothPath(points) {
@@ -634,7 +635,7 @@
     for (var a = 0; a <= xMax; a += 0.5) {
       maxVal = Math.max(maxVal, balanceAt(s.seed, s.annual, s.rate, a), putInAt(s.seed, s.annual, a));
     }
-    var top = niceTop(maxVal);
+    var top = niceTop(maxVal, 1.04);
 
     var x = function (age) { return padL + (age / xMax) * plotW; };
     var yPix = function (v) { return padT + plotH - (v / top) * plotH; };
@@ -663,18 +664,39 @@
     }
     if (xMax % 5 !== 0) ctx.fillText(xMax, x(xMax), cssH - 16);
 
-    // Balance area (gold gradient fill)
+    // Balance + contribution curves
     var balPts = [];
+    var putPts = [];
     for (var ba = 0; ba <= xMax; ba += 0.5) {
       balPts.push({ x: x(ba), y: yPix(balanceAt(s.seed, s.annual, s.rate, ba)) });
+      putPts.push({ x: x(ba), y: yPix(putInAt(s.seed, s.annual, ba)) });
     }
-    smoothPath(balPts);
+
+    // Your money region (under the contribution line): dim
+    smoothPath(putPts);
     ctx.lineTo(x(xMax), cssH - padB);
     ctx.lineTo(padL, cssH - padB);
     ctx.closePath();
+    ctx.fillStyle = "rgba(148,155,170,0.10)";
+    ctx.fill();
+
+    // Growth region (wedge between balance and contribution lines): gold
+    ctx.beginPath();
+    ctx.moveTo(padL, cssH - padB);
+    ctx.lineTo(balPts[0].x, balPts[0].y);
+    for (var gi = 1; gi < balPts.length - 1; gi++) {
+      var gxc = (balPts[gi].x + balPts[gi + 1].x) / 2;
+      var gyc = (balPts[gi].y + balPts[gi + 1].y) / 2;
+      ctx.quadraticCurveTo(balPts[gi].x, balPts[gi].y, gxc, gyc);
+    }
+    ctx.lineTo(balPts[balPts.length - 1].x, balPts[balPts.length - 1].y);
+    for (var gp = putPts.length - 1; gp >= 0; gp--) {
+      ctx.lineTo(putPts[gp].x, putPts[gp].y);
+    }
+    ctx.closePath();
     var grad = ctx.createLinearGradient(0, padT, 0, cssH - padB);
-    grad.addColorStop(0, "rgba(231,185,74,0.25)");
-    grad.addColorStop(1, "rgba(231,185,74,0)");
+    grad.addColorStop(0, "rgba(231,185,74,0.5)");
+    grad.addColorStop(1, "rgba(231,185,74,0.05)");
     ctx.fillStyle = grad;
     ctx.fill();
 
@@ -718,6 +740,32 @@
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 2;
     ctx.stroke();
+
+    // Growth label (chip just left of the dot)
+    var growth = balanceAt(s.seed, s.annual, s.rate, s.age) - putInAt(s.seed, s.annual, s.age);
+    var label = "+" + fmtCompact(growth) + " growth";
+    var lfont = cssW < 320 ? 9 : 10;
+    ctx.font = lfont + "px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+    var tw = ctx.measureText(label).width;
+    var lh = lfont + 4, padX = 7;
+    var lw = tw + padX * 2;
+    var lx = mx - lw - 14;
+    var ly = mpy - lh / 2;
+    if (lx < padL) lx = padL;
+    if (ly < padT) ly = padT;
+    if (ly + lh > cssH - padB) ly = cssH - padB - lh;
+    ctx.beginPath();
+    ctx.roundRect(lx, ly, lw, lh, 6);
+    ctx.fillStyle = "rgba(0,0,0,0.72)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(231,185,74,0.6)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = "#f5d98a";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, lx + padX, ly + lh / 2 + 0.5);
+    ctx.textBaseline = "alphabetic";
   }
 
   /* ---------- Wire up ---------- */
