@@ -103,9 +103,6 @@
 
   #seedVal {
     color: var(--gold);
-    text-decoration: underline;
-    text-decoration-color: var(--gold-dark);
-    text-underline-offset: 3px;
   }
 
   input[type=range] {
@@ -181,8 +178,8 @@
     font-variant-numeric: tabular-nums;
     transition: width 0.2s ease;
   }
-  .bar .yours { background: #e8e6dd; }
-  .bar .growth { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
+  .bar .yours { background: #e8e6dd; min-width: 28px; }
+  .bar .growth { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); flex: 1 1 auto; }
 
   .money-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .money-tile { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
