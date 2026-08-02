@@ -404,22 +404,22 @@
         <div class="buy-grid">
           <div class="buy-item">
             <div class="bi-head"><div class="bi-name">🚗 Car</div><div class="bi-val" id="buyCarVal">—</div></div>
-            <div class="bi-avg" id="buyCarAvg">avg $49k · 2026</div>
+            <div class="bi-avg">avg $49k</div>
             <div class="bi-bar"><div class="bi-fill" id="buyCar" style="width:0%"></div></div>
           </div>
           <div class="buy-item">
             <div class="bi-head"><div class="bi-name">🎓 Undergrad</div><div class="bi-val" id="buySchoolVal">—</div></div>
-            <div class="bi-avg" id="buySchoolAvg">avg $160k · 2026</div>
+            <div class="bi-avg">avg $160k</div>
             <div class="bi-bar"><div class="bi-fill" id="buySchool" style="width:0%"></div></div>
           </div>
           <div class="buy-item">
             <div class="bi-head"><div class="bi-name">📚 Graduate school</div><div class="bi-val" id="buyLawVal">—</div></div>
-            <div class="bi-avg" id="buyLawAvg">avg $75k · 2026</div>
+            <div class="bi-avg">avg $75k</div>
             <div class="bi-bar"><div class="bi-fill" id="buyLaw" style="width:0%"></div></div>
           </div>
           <div class="buy-item">
             <div class="bi-head"><div class="bi-name">🏠 House</div><div class="bi-val" id="buyHouseVal">—</div></div>
-            <div class="bi-avg" id="buyHouseAvg">avg $418k · 2026</div>
+            <div class="bi-avg">avg $418k</div>
             <div class="bi-bar"><div class="bi-fill" id="buyHouse" style="width:0%"></div></div>
           </div>
         </div>
@@ -562,29 +562,23 @@
     document.getElementById("yoursVal").textContent = fmt(putIn);
     document.getElementById("growthVal").textContent = fmt(growth);
 
-    updateBuy(balance, s.age);
+    updateBuy(balance);
 
     scheduleChart();
   }
 
-  // 2026 avg costs + historical annual trend. Cost in year (2026 + age) is
-  // base * (1 + trend)^age. Car ~3%/yr; college/grad/house ~4%/yr.
   var BUY_AVG = [
-    ["buyCar", "buyCarVal", "buyCarAvg", 49000, 0.03],
-    ["buySchool", "buySchoolVal", "buySchoolAvg", 160000, 0.04],
-    ["buyLaw", "buyLawVal", "buyLawAvg", 75000, 0.04],
-    ["buyHouse", "buyHouseVal", "buyHouseAvg", 418000, 0.04]
+    ["buyCar", "buyCarVal", "buyCarAvg", 49000],
+    ["buySchool", "buySchoolVal", "buySchoolAvg", 160000],
+    ["buyLaw", "buyLawVal", "buyLawAvg", 75000],
+    ["buyHouse", "buyHouseVal", "buyHouseAvg", 418000]
   ];
-  var BUY_BASE_YEAR = 2026;
 
-  function updateBuy(balance, age) {
+  function updateBuy(balance) {
     BUY_AVG.forEach(function (row) {
       var fill = document.getElementById(row[0]);
       var val = document.getElementById(row[1]);
-      var avgEl = document.getElementById(row[2]);
-      var avg = row[3] * Math.pow(1 + row[4], age);
-      var year = BUY_BASE_YEAR + age;
-      avgEl.textContent = "avg " + fmtCompact(avg) + " · " + year;
+      var avg = row[3];
       var ratio = balance / avg;
       var pct = Math.min(100, Math.max(0, ratio * 100));
       fill.style.width = pct + "%";
