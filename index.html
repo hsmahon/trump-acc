@@ -335,8 +335,7 @@
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="flags" aria-hidden="true">🇺🇸 ⭐ 🦅 ⭐ 🇺🇸</div>
+    <header>
     <h1>Trump Accounts</h1>
     <p class="tagline">⭐ Plan for Your American Dream.</p>
   </header>
@@ -371,18 +370,12 @@
 
       <div class="control">
         <label>
-          <span>Expected Return <span class="sub">S&amp;P 500 history ≈ 10.3% nom. · σ ≈ 16%</span></span>
-          <span class="value" id="rateVal">10%</span>
+          <span>Market History <span class="sub">S&amp;P 500 · μ≈10.3% · σ≈16% · 5,000 paths</span></span>
+          <span class="value">Monte Carlo</span>
         </label>
-        <input type="range" id="rate" min="5" max="15" step="0.5" value="10">
       </div>
 
-      <div class="tabs" role="tablist" aria-label="Projection mode" style="margin-bottom:8px">
-        <button class="tab active" data-mode="fixed" role="tab" aria-selected="true">Fixed<small>single return</small></button>
-        <button class="tab" data-mode="mc" role="tab" aria-selected="false">Monte Carlo<small>5,000 paths</small></button>
-      </div>
-
-      <div class="tabs" id="pctTabs" role="tablist" aria-label="Scenario" style="display:none">
+      <div class="tabs" id="pctTabs" role="tablist" aria-label="Scenario">
         <button class="tab" data-pct="p10" role="tab">Low<small>P10</small></button>
         <button class="tab active" data-pct="median" role="tab" aria-selected="true">Median<small>P50</small></button>
         <button class="tab" data-pct="mean" role="tab" aria-selected="false">Average<small>mean ★</small></button>
@@ -525,8 +518,7 @@
   var MC_MU = 0.103, MC_SIGMA = 0.16, MC_FEE = 0.0007;
   var contribEl = document.getElementById("contrib");
   var employerEl = document.getElementById("employer");
-  var rateEl = document.getElementById("rate");
-  var mode = "fixed", pct = "median";
+  var mode = "mc", pct = "median";
   var mcCache = { key: "", bands: null };
   var activeAge = 18;
   var canvas = document.getElementById("chart");
@@ -541,7 +533,6 @@
       fam: fam, emp: emp,
       annual: total,
       capped: (fam + emp) > 5000,
-      rate: +rateEl.value,
       age: activeAge, mode: mode, pct: pct
     };
   }
@@ -563,18 +554,8 @@
     });
   });
 
-  document.querySelectorAll('[data-mode]').forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      mode = tab.dataset.mode;
-      document.querySelectorAll("[data-mode]").forEach(function (t) {
-        var on = t === tab;
-        t.classList.toggle("active", on);
-        t.setAttribute("aria-selected", on ? "true" : "false");
-      });
-      document.getElementById("pctTabs").style.display = mode === "mc" ? "flex" : "none";
-      update();
-    });
-  });
+  var pctTabsEl = document.getElementById("pctTabs");
+  if (pctTabsEl) pctTabsEl.style.display = "flex";
 
   document.querySelectorAll('[data-pct]').forEach(function (tab) {
     tab.addEventListener("click", function () {
@@ -677,21 +658,15 @@
     if (s.capped) {
       document.getElementById("contribVal").textContent = fmt(s.fam) + "/yr · total capped at $5k";
     }
-    document.getElementById("rateVal").textContent = s.rate + "%";
-    setSliderFill(contribEl); setSliderFill(employerEl); setSliderFill(rateEl);
+    setSliderFill(contribEl); setSliderFill(employerEl);
 
     var balance, putIn, growth, subExtra = "";
     putIn = putInAt(s.seed, s.annual, s.age);
-    if (s.mode === "mc") {
-      var bands = mcBands(s.seed, s.annual, 55);
-      balance = mcValue(bands, s.pct, s.age);
-      var lbl = { p10: "P10 low", median: "median (P50)", mean: "average (mean) ★", p75: "above-average (P75)" }[s.pct] || s.pct;
-      subExtra = " · Monte Carlo " + lbl + " · S&P hist μ≈10.3% σ≈16% · 5k paths";
-      growth = balance - putIn;
-    } else {
-      balance = balanceAt(s.seed, s.annual, s.rate, s.age);
-      growth = balance - putIn;
-    }
+    var bands = mcBands(s.seed, s.annual, 55);
+    balance = mcValue(bands, s.pct, s.age);
+    var lbl = { p10: "P10 low", median: "median (P50)", mean: "average (mean) ★", p75: "above-average (P75)" }[s.pct] || s.pct;
+    subExtra = " · " + lbl + " · S&P hist μ≈10.3% σ≈16% · 5k paths";
+    growth = balance - putIn;
 
     document.getElementById("ageLabel").textContent = s.age;
     document.getElementById("headline").textContent = fmt(balance);
@@ -778,11 +753,10 @@
 
     var xMax = s.age;
     var maxVal = 0;
-    var bands = null;
-    if (s.mode === "mc") bands = mcBands(s.seed, s.annual, 55);
+    var bands = mcBands(s.seed, s.annual, 55);
     for (var a = 0; a <= xMax; a += 0.5) {
-      maxVal = Math.max(maxVal, balanceAt(s.seed, s.annual, s.rate, a), putInAt(s.seed, s.annual, a));
-      if (bands) maxVal = Math.max(maxVal, mcValue(bands, "p90", Math.round(a)));
+      maxVal = Math.max(maxVal, putInAt(s.seed, s.annual, a));
+      maxVal = Math.max(maxVal, mcValue(bands, "p90", Math.round(a)));
     }
     var top = niceTop(maxVal, 1.04);
 
@@ -813,11 +787,11 @@
     }
     if (xMax % 5 !== 0) ctx.fillText(xMax, x(xMax), cssH - 16);
 
-    // Balance + contribution curves
+    // Balance + contribution curves (median from MC bands)
     var balPts = [];
     var putPts = [];
     for (var ba = 0; ba <= xMax; ba += 0.5) {
-      balPts.push({ x: x(ba), y: yPix(balanceAt(s.seed, s.annual, s.rate, ba)) });
+      balPts.push({ x: x(ba), y: yPix(mcValue(bands, "median", Math.round(ba))) });
       putPts.push({ x: x(ba), y: yPix(putInAt(s.seed, s.annual, ba)) });
     }
 
@@ -861,8 +835,8 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Balance line (gold, smooth) — fixed mode; MC: fan + median thin + mean distinct
-    if (s.mode === "mc" && bands) {
+    // Fan chart: bands + median thin + mean most distinct + P75 dotted
+    {
       var bi = function (arr, age) { return arr[Math.max(0, Math.min(arr.length - 1, Math.round(age)))]; };
       function bandPath(lo, hi) {
         ctx.beginPath();
@@ -887,17 +861,10 @@
       ctx.beginPath();
       for (var m4 = 0; m4 <= xMax; m4++) { if (m4 === 0) ctx.moveTo(x(m4), yPix(bi(bands.p75, m4))); else ctx.lineTo(x(m4), yPix(bi(bands.p75, m4))); }
       ctx.setLineDash([4, 4]); ctx.strokeStyle = "rgba(245,217,138,0.9)"; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
-    } else {
-      smoothPath(balPts);
-      ctx.strokeStyle = "#e7b94a";
-      ctx.lineWidth = 3;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.stroke();
     }
 
     // Active-age marker (glowing dot)
-    var headVal = (s.mode === "mc" && bands) ? mcValue(bands, s.pct, s.age) : balanceAt(s.seed, s.annual, s.rate, s.age);
+    var headVal = mcValue(bands, s.pct, s.age);
     var mx = x(s.age), mpy = yPix(headVal);
     ctx.strokeStyle = "rgba(255,255,255,0.18)";
     ctx.setLineDash([3, 3]);
@@ -947,7 +914,7 @@
 
   /* ---------- Wire up ---------- */
 
-  [contribEl, employerEl, rateEl].forEach(function (el) {
+  [contribEl, employerEl].forEach(function (el) {
     el.addEventListener("input", update);
   });
 
