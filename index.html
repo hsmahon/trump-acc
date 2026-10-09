@@ -355,7 +355,7 @@
 
       <div class="control">
         <label>
-          <span>Your Contribution <span class="sub">Per year, up to $5,000</span></span>
+          <span>Family Contribution <span class="sub">Per year — you, family, others</span></span>
           <span class="value" id="contribVal">$250/yr</span>
         </label>
         <input type="range" id="contrib" min="0" max="5000" step="25" value="250">
@@ -363,13 +363,33 @@
 
       <div class="control">
         <label>
-          <span>Expected Return <span class="sub">Historical S&amp;P 500 average ≈ 10%</span></span>
+          <span>Employer Match <span class="sub">Per year, up to $2,500 · counts toward $5k cap</span></span>
+          <span class="value" id="employerVal">$0/yr</span>
+        </label>
+        <input type="range" id="employer" min="0" max="2500" step="100" value="0">
+      </div>
+
+      <div class="control">
+        <label>
+          <span>Expected Return <span class="sub">S&amp;P 500 history ≈ 10.3% nom. · σ ≈ 16%</span></span>
           <span class="value" id="rateVal">10%</span>
         </label>
         <input type="range" id="rate" min="5" max="15" step="0.5" value="10">
       </div>
 
-      <div class="note" id="taxNote">🏛️ Tax-advantaged, traditional IRA-style. Contributions stop at 18.</div>
+      <div class="tabs" role="tablist" aria-label="Projection mode" style="margin-bottom:8px">
+        <button class="tab active" data-mode="fixed" role="tab" aria-selected="true">Fixed<small>single return</small></button>
+        <button class="tab" data-mode="mc" role="tab" aria-selected="false">Monte Carlo<small>5,000 paths</small></button>
+      </div>
+
+      <div class="tabs" id="pctTabs" role="tablist" aria-label="Scenario" style="display:none">
+        <button class="tab" data-pct="p10" role="tab">Low<small>P10</small></button>
+        <button class="tab active" data-pct="median" role="tab" aria-selected="true">Median<small>P50</small></button>
+        <button class="tab" data-pct="mean" role="tab" aria-selected="false">Average<small>mean ★</small></button>
+        <button class="tab" data-pct="p75" role="tab" aria-selected="false">Above avg<small>P75</small></button>
+      </div>
+
+      <div class="note" id="taxNote">🏛️ Tax-advantaged, traditional IRA-style. $5k/yr cap (family + employer). Treasury $1k seed excluded. Contributions stop at 18, then it rides as an IRA.</div>
     </section>
 
     <!-- Right: results -->
@@ -433,7 +453,7 @@
   </div>
 
   <footer>
-    Based on the <a href="https://trumpaccounts.gov" target="_blank" rel="noopener">official Trump Accounts program</a> (trumpaccounts.gov). Projections are estimates for illustration only.
+    Based on the <a href="https://trumpaccounts.gov" target="_blank" rel="noopener">official Trump Accounts program</a> (trumpaccounts.gov). $5k/yr cap incl. employer (≤$2.5k/employee); Treasury $1k seed excluded. Monte Carlo uses S&amp;P 500 history (μ≈10.3%, σ≈16%, 0.07% fee, 5k paths). Projections are estimates for illustration only.
     <div class="src">What-your-balance-could-buy averages are 2026 figures from <a href="https://www.kbb.com" target="_blank" rel="noopener">Kelley Blue Book</a>, <a href="https://research.collegeboard.org/trends/college-pricing" target="_blank" rel="noopener">College Board</a>, <a href="https://educationdata.org" target="_blank" rel="noopener">EducationData</a> &amp; <a href="https://www.nar.realtor" target="_blank" rel="noopener">NAR</a>. 🇺🇸 🦅</div>
   </footer>
 
@@ -501,19 +521,28 @@
   /* ---------- State + DOM ---------- */
 
   var SEED = 1000;
+  var MC_N = 5000;
+  var MC_MU = 0.103, MC_SIGMA = 0.16, MC_FEE = 0.0007;
   var contribEl = document.getElementById("contrib");
+  var employerEl = document.getElementById("employer");
   var rateEl = document.getElementById("rate");
+  var mode = "fixed", pct = "median";
+  var mcCache = { key: "", bands: null };
   var activeAge = 18;
   var canvas = document.getElementById("chart");
   var ctx = canvas.getContext("2d");
   var raf = null;
 
   function state() {
+    var fam = +contribEl.value, emp = +employerEl.value;
+    var total = Math.min(5000, fam + emp);
     return {
       seed: SEED,
-      annual: +contribEl.value,
+      fam: fam, emp: emp,
+      annual: total,
+      capped: (fam + emp) > 5000,
       rate: +rateEl.value,
-      age: activeAge
+      age: activeAge, mode: mode, pct: pct
     };
   }
 
@@ -522,10 +551,10 @@
     el.style.setProperty("--pct", pct + "%");
   }
 
-  document.querySelectorAll(".tab").forEach(function (tab) {
+  document.querySelectorAll('[data-age]').forEach(function (tab) {
     tab.addEventListener("click", function () {
       activeAge = +tab.dataset.age;
-      document.querySelectorAll(".tab").forEach(function (t) {
+      document.querySelectorAll("[data-age]").forEach(function (t) {
         var on = t === tab;
         t.classList.toggle("active", on);
         t.setAttribute("aria-selected", on ? "true" : "false");
@@ -534,24 +563,140 @@
     });
   });
 
+  document.querySelectorAll('[data-mode]').forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      mode = tab.dataset.mode;
+      document.querySelectorAll("[data-mode]").forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      document.getElementById("pctTabs").style.display = mode === "mc" ? "flex" : "none";
+      update();
+    });
+  });
+
+  document.querySelectorAll('[data-pct]').forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      pct = tab.dataset.pct;
+      document.querySelectorAll("[data-pct]").forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      update();
+    });
+  });
+
+  /* ---------- Monte Carlo (historic S&P calibration) ---------- */
+
+  // Seeded RNG (mulberry32) for reproducible bands.
+  function rng32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Simulate N paths, yearly lognormal returns from monthly steps.
+  // Returns per-integer-age percentile bands {p10,p25,median,mean,p75,p90}.
+  function mcBands(seed, annual, maxAge) {
+    var key = seed + "|" + annual + "|" + maxAge;
+    if (mcCache.key === key && mcCache.bands) return mcCache.bands;
+    var rand = rng32(20260704);
+    var spare = null;
+    function gauss() {
+      if (spare !== null) { var v = spare; spare = null; return v; }
+      var u1 = Math.max(rand(), 1e-12), u2 = rand();
+      var m = Math.sqrt(-2 * Math.log(u1));
+      spare = m * Math.sin(2 * Math.PI * u2);
+      return m * Math.cos(2 * Math.PI * u2);
+    }
+    var driftM = (MC_MU - MC_FEE - 0.5 * MC_SIGMA * MC_SIGMA) / 12;
+    var volM = MC_SIGMA / Math.sqrt(12);
+    var m = annual / 12;
+    var ages = [];
+    for (var a = 0; a <= maxAge; a++) ages.push(a);
+    var paths = new Float64Array(MC_N);
+    for (var i = 0; i < MC_N; i++) paths[i] = seed;
+    var bands = { p10: [], p25: [], median: [], mean: [], p75: [], p90: [], ages: ages };
+    var sorted = new Float64Array(MC_N);
+    var nextIdx = 1;
+    sorted.set(paths); sorted.sort();
+    pushStats(bands, sorted);
+    for (var mo = 1; mo <= maxAge * 12; mo++) {
+      var add = mo <= 18 * 12 ? m : 0;
+      for (var j = 0; j < MC_N; j++) {
+        var g = driftM + volM * gauss();
+        paths[j] = paths[j] * Math.exp(g) + add;
+      }
+      if (nextIdx < ages.length && mo / 12 >= ages[nextIdx] - 1e-9) {
+        sorted.set(paths); sorted.sort();
+        pushStats(bands, sorted);
+        nextIdx++;
+      }
+    }
+    mcCache = { key: key, bands: bands };
+    return bands;
+  }
+
+  function quantile(sorted, q) {
+    var pos = (sorted.length - 1) * q;
+    var lo = Math.floor(pos), hi = Math.ceil(pos);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+  }
+
+  function pushStats(bands, sorted) {
+    var sum = 0;
+    for (var i = 0; i < sorted.length; i++) sum += sorted[i];
+    bands.p10.push(quantile(sorted, 0.10));
+    bands.p25.push(quantile(sorted, 0.25));
+    bands.median.push(quantile(sorted, 0.50));
+    bands.mean.push(sum / sorted.length);
+    bands.p75.push(quantile(sorted, 0.75));
+    bands.p90.push(quantile(sorted, 0.90));
+  }
+
+  function mcValue(bands, name, age) {
+    var i = Math.max(0, Math.min(bands.ages.length - 1, Math.round(age)));
+    var map = { p10: bands.p10, p25: bands.p25, median: bands.median, mean: bands.mean, p75: bands.p75, p90: bands.p90 };
+    return map[name][i];
+  }
+
   /* ---------- Render ---------- */
 
   function update() {
     var s = state();
 
     document.getElementById("seedVal").textContent = fmt(SEED);
-    document.getElementById("contribVal").textContent = fmt(s.annual) + "/yr";
+    document.getElementById("contribVal").textContent = fmt(s.fam) + "/yr";
+    document.getElementById("employerVal").textContent = fmt(s.emp) + "/yr";
+    if (s.capped) {
+      document.getElementById("contribVal").textContent = fmt(s.fam) + "/yr · total capped at $5k";
+    }
     document.getElementById("rateVal").textContent = s.rate + "%";
-    setSliderFill(contribEl); setSliderFill(rateEl);
+    setSliderFill(contribEl); setSliderFill(employerEl); setSliderFill(rateEl);
 
-    var balance = balanceAt(s.seed, s.annual, s.rate, s.age);
-    var putIn = putInAt(s.seed, s.annual, s.age);
-    var growth = balance - putIn;
+    var balance, putIn, growth, subExtra = "";
+    putIn = putInAt(s.seed, s.annual, s.age);
+    if (s.mode === "mc") {
+      var bands = mcBands(s.seed, s.annual, 55);
+      balance = mcValue(bands, s.pct, s.age);
+      var lbl = { p10: "P10 low", median: "median (P50)", mean: "average (mean) ★", p75: "above-average (P75)" }[s.pct] || s.pct;
+      subExtra = " · Monte Carlo " + lbl + " · S&P hist μ≈10.3% σ≈16% · 5k paths";
+      growth = balance - putIn;
+    } else {
+      balance = balanceAt(s.seed, s.annual, s.rate, s.age);
+      growth = balance - putIn;
+    }
 
     document.getElementById("ageLabel").textContent = s.age;
     document.getElementById("headline").textContent = fmt(balance);
     document.getElementById("headlineSub").innerHTML =
-      "You and the government put in <b>" + fmt(putIn) + "</b> — growth made <b class=\"gold\">" + fmt(growth) + "</b> for free.";
+      "You, family, employer + gov put in <b>" + fmt(putIn) + "</b> — growth made <b class=\"gold\">" + fmt(growth) + "</b> for free." + (subExtra ? "<br><span>" + subExtra + "</span>" : "");
 
     var total = Math.max(balance, 1);
     var pctYours = (putIn / total) * 100;
@@ -633,8 +778,11 @@
 
     var xMax = s.age;
     var maxVal = 0;
+    var bands = null;
+    if (s.mode === "mc") bands = mcBands(s.seed, s.annual, 55);
     for (var a = 0; a <= xMax; a += 0.5) {
       maxVal = Math.max(maxVal, balanceAt(s.seed, s.annual, s.rate, a), putInAt(s.seed, s.annual, a));
+      if (bands) maxVal = Math.max(maxVal, mcValue(bands, "p90", Math.round(a)));
     }
     var top = niceTop(maxVal, 1.04);
 
@@ -713,16 +861,44 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Balance line (gold, smooth)
-    smoothPath(balPts);
-    ctx.strokeStyle = "#e7b94a";
-    ctx.lineWidth = 3;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    ctx.stroke();
+    // Balance line (gold, smooth) — fixed mode; MC: fan + median thin + mean distinct
+    if (s.mode === "mc" && bands) {
+      var bi = function (arr, age) { return arr[Math.max(0, Math.min(arr.length - 1, Math.round(age)))]; };
+      function bandPath(lo, hi) {
+        ctx.beginPath();
+        for (var k = 0; k <= xMax; k++) { var px = x(k), py = yPix(bi(hi, k)); if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+        for (var k2 = xMax; k2 >= 0; k2--) ctx.lineTo(x(k2), yPix(bi(lo, k2)));
+        ctx.closePath();
+      }
+      bandPath(bands.p10, bands.p90);
+      ctx.fillStyle = "rgba(231,185,74,0.12)"; ctx.fill();
+      bandPath(bands.p25, bands.p75);
+      ctx.fillStyle = "rgba(231,185,74,0.22)"; ctx.fill();
+      // Median thin
+      ctx.beginPath();
+      for (var m2 = 0; m2 <= xMax; m2++) { if (m2 === 0) ctx.moveTo(x(m2), yPix(bi(bands.median, m2))); else ctx.lineTo(x(m2), yPix(bi(bands.median, m2))); }
+      ctx.strokeStyle = "rgba(245,217,138,0.7)"; ctx.lineWidth = 1.5; ctx.stroke();
+      // Mean = most distinct: thick white-gold line
+      ctx.beginPath();
+      for (var m3 = 0; m3 <= xMax; m3++) { if (m3 === 0) ctx.moveTo(x(m3), yPix(bi(bands.mean, m3))); else ctx.lineTo(x(m3), yPix(bi(bands.mean, m3))); }
+      ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.lineJoin = "round"; ctx.stroke();
+      ctx.strokeStyle = "#e7b94a"; ctx.lineWidth = 2.5; ctx.stroke();
+      // P75 dotted above-average
+      ctx.beginPath();
+      for (var m4 = 0; m4 <= xMax; m4++) { if (m4 === 0) ctx.moveTo(x(m4), yPix(bi(bands.p75, m4))); else ctx.lineTo(x(m4), yPix(bi(bands.p75, m4))); }
+      ctx.setLineDash([4, 4]); ctx.strokeStyle = "rgba(245,217,138,0.9)"; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+    } else {
+      smoothPath(balPts);
+      ctx.strokeStyle = "#e7b94a";
+      ctx.lineWidth = 3;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.stroke();
+    }
 
     // Active-age marker (glowing dot)
-    var mx = x(s.age), mpy = yPix(balanceAt(s.seed, s.annual, s.rate, s.age));
+    var headVal = (s.mode === "mc" && bands) ? mcValue(bands, s.pct, s.age) : balanceAt(s.seed, s.annual, s.rate, s.age);
+    var mx = x(s.age), mpy = yPix(headVal);
     ctx.strokeStyle = "rgba(255,255,255,0.18)";
     ctx.setLineDash([3, 3]);
     ctx.beginPath(); ctx.moveTo(mx, padT); ctx.lineTo(mx, cssH - padB); ctx.stroke();
@@ -743,7 +919,7 @@
     ctx.stroke();
 
     // Growth label (chip just left of the dot)
-    var growth = balanceAt(s.seed, s.annual, s.rate, s.age) - putInAt(s.seed, s.annual, s.age);
+    var growth = headVal - putInAt(s.seed, s.annual, s.age);
     var label = "+" + fmtCompact(growth) + " growth";
     var lfont = cssW < 320 ? 9 : 10;
     ctx.font = lfont + "px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
@@ -771,7 +947,7 @@
 
   /* ---------- Wire up ---------- */
 
-  [contribEl, rateEl].forEach(function (el) {
+  [contribEl, employerEl, rateEl].forEach(function (el) {
     el.addEventListener("input", update);
   });
 
