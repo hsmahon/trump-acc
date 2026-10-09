@@ -368,17 +368,9 @@
         <input type="range" id="employer" min="0" max="2500" step="100" value="0">
       </div>
 
-      <div class="control">
-        <label>
-          <span>Market History <span class="sub">S&amp;P 500 · μ≈10.3% · σ≈16% · 5,000 paths</span></span>
-          <span class="value">Monte Carlo</span>
-        </label>
-      </div>
-
       <div class="tabs" id="pctTabs" role="tablist" aria-label="Scenario">
         <button class="tab" data-pct="p10" role="tab">Low<small>P10</small></button>
         <button class="tab active" data-pct="median" role="tab" aria-selected="true">Median<small>P50</small></button>
-        <button class="tab" data-pct="mean" role="tab" aria-selected="false">Average<small>mean ★</small></button>
         <button class="tab" data-pct="p75" role="tab" aria-selected="false">Above avg<small>P75</small></button>
       </div>
 
@@ -664,7 +656,7 @@
     putIn = putInAt(s.seed, s.annual, s.age);
     var bands = mcBands(s.seed, s.annual, 55);
     balance = mcValue(bands, s.pct, s.age);
-    var lbl = { p10: "P10 low", median: "median (P50)", mean: "average (mean) ★", p75: "above-average (P75)" }[s.pct] || s.pct;
+    var lbl = { p10: "P10 low", median: "median (P50)", p75: "above-average (P75)" }[s.pct] || s.pct;
     subExtra = " · " + lbl + " · S&P hist μ≈10.3% σ≈16% · 5k paths";
     growth = balance - putIn;
 
@@ -848,13 +840,9 @@
       ctx.fillStyle = "rgba(231,185,74,0.12)"; ctx.fill();
       bandPath(bands.p25, bands.p75);
       ctx.fillStyle = "rgba(231,185,74,0.22)"; ctx.fill();
-      // Median thin
+      // Median = most distinct: thick white-gold line
       ctx.beginPath();
       for (var m2 = 0; m2 <= xMax; m2++) { if (m2 === 0) ctx.moveTo(x(m2), yPix(bi(bands.median, m2))); else ctx.lineTo(x(m2), yPix(bi(bands.median, m2))); }
-      ctx.strokeStyle = "rgba(245,217,138,0.7)"; ctx.lineWidth = 1.5; ctx.stroke();
-      // Mean = most distinct: thick white-gold line
-      ctx.beginPath();
-      for (var m3 = 0; m3 <= xMax; m3++) { if (m3 === 0) ctx.moveTo(x(m3), yPix(bi(bands.mean, m3))); else ctx.lineTo(x(m3), yPix(bi(bands.mean, m3))); }
       ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.lineJoin = "round"; ctx.stroke();
       ctx.strokeStyle = "#e7b94a"; ctx.lineWidth = 2.5; ctx.stroke();
       // P75 dotted above-average
